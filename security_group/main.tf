@@ -137,7 +137,8 @@ resource "aws_security_group_rule" "was_http_rule" {
     protocol = "tcp"
     type = "ingress"
 
-    cidr_blocks = ["0.0.0.0/0"]
+    # cidr_blocks = ["0.0.0.0/0"]
+    source_security_group_id = aws_security_group.infra_security_group_web.id
 }
 
 resource "aws_security_group_rule" "was_egress_rule" {

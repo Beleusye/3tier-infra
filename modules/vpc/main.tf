@@ -32,7 +32,6 @@ resource "aws_subnet" "infra_private_subnet" {
     Name = "private_subnet${count.index}"
   }
 }
-## SUBNET END
 
 ## INTERNET GATEWAY
 resource "aws_internet_gateway" "infra_internet_gateway" {
@@ -61,7 +60,6 @@ resource "aws_route_table_association" "infra_route_association_public" {
   route_table_id = aws_route_table.infra_route_internet_gateway.id
   subnet_id = aws_subnet.infra_public_subnet[count.index].id
 }
-## INTERNET GATEWAY END
 
 ## NAT GATEWAY
 resource "aws_eip" "infra_eip_ngw" {
@@ -99,4 +97,3 @@ resource "aws_route_table_association" "infra_route_association_private" {
   route_table_id = aws_route_table.infra_route_nat_gateway.id
   subnet_id = aws_subnet.infra_private_subnet[count.index].id
 }
-## NAT GATEWAY END

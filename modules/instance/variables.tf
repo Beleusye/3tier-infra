@@ -3,11 +3,6 @@ variable "region" {
   type = string
 }
 
-variable "availability_zone" {
-  description = "AWS Availability Zone"
-  type = string
-}
-
 variable "ami_id" {
   description = "Instance Image ID"
   type = string

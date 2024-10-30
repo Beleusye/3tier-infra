@@ -20,24 +20,13 @@ data "terraform_remote_state" "security_group" {
   }
 }
 
-data "terraform_remote_state" "loadbalancer" {
+data "terraform_remote_state" "instance" {
   backend = "remote"
 
   config = {
     organization = "kpikachu"
     workspaces = {
-      name = "loadbalancer_test"
-    }
-  }
-}
-
-data "terraform_remote_state" "rds" {
-  backend = "remote"
-
-  config = {
-    organization = "kpikachu"
-    workspaces = {
-      name = "rds_test"
+      name = "instance_test"
     }
   }
 }
