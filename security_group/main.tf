@@ -40,7 +40,7 @@ resource "aws_security_group" "infra_security_group_alb" {
     }
 }
 
-resource "aws_security_group_rule" "alb_http_rule" {
+resource "aws_security_group_rule" "alb_http_ingress" {
     security_group_id = aws_security_group.infra_security_group_alb.id
     description = "HTTP"
     
@@ -51,12 +51,34 @@ resource "aws_security_group_rule" "alb_http_rule" {
     cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "alb_egress_rule" {
+resource "aws_security_group_rule" "alb_https_ingress" {
+    security_group_id = aws_security_group.infra_security_group_alb.id
+    description = "HTTP"
+    
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    type = "ingress"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "alb_http_egress" {
     security_group_id = aws_security_group.infra_security_group_alb.id
     description = "ALL"
     
     from_port = 80
     to_port = 80
+    protocol = "tcp"
+    type = "egress"
+    source_security_group_id = aws_security_group.infra_security_group_web.id
+}
+
+resource "aws_security_group_rule" "alb_https_egress" {
+    security_group_id = aws_security_group.infra_security_group_alb.id
+    description = "ALL"
+    
+    from_port = 443
+    to_port = 443
     protocol = "tcp"
     type = "egress"
     source_security_group_id = aws_security_group.infra_security_group_web.id
@@ -72,7 +94,7 @@ resource "aws_security_group" "infra_security_group_web" {
     }
 }
 
-resource "aws_security_group_rule" "web_ssh_rule" {
+resource "aws_security_group_rule" "web_ssh_ingress" {
     security_group_id = aws_security_group.infra_security_group_web.id
     description = "SSH"
     
@@ -84,7 +106,7 @@ resource "aws_security_group_rule" "web_ssh_rule" {
     source_security_group_id = aws_security_group.infra_security_group_bastion.id
 }
 
-resource "aws_security_group_rule" "web_http_rule" {
+resource "aws_security_group_rule" "web_http_ingress" {
     security_group_id = aws_security_group.infra_security_group_web.id
     description = "HTTP"
     
@@ -95,7 +117,7 @@ resource "aws_security_group_rule" "web_http_rule" {
     source_security_group_id = aws_security_group.infra_security_group_alb.id
 }
 
-resource "aws_security_group_rule" "web_egress_rule" {
+resource "aws_security_group_rule" "web_all_egress" {
     security_group_id = aws_security_group.infra_security_group_web.id
     description = "ALL"
     
@@ -104,6 +126,38 @@ resource "aws_security_group_rule" "web_egress_rule" {
     protocol = "-1"
     type = "egress"
     cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group" "infra_security_group_nlb" {
+    name = "nlb_security_group"
+    description = "Network LoadBalancer Security Group"
+    vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+
+    tags = {
+        Name = "infra-nlb-security-group"
+    }
+}
+
+resource "aws_security_group_rule" "nlb_was_ingress" {
+    security_group_id = aws_security_group.infra_security_group_nlb.id
+    description = "tomcat"
+    
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    type = "ingress"
+    source_security_group_id = aws_security_group.infra_security_group_web.id
+}
+
+resource "aws_security_group_rule" "nlb_was_egress" {
+    security_group_id = aws_security_group.infra_security_group_nlb.id
+    description = "ALL"
+    
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    type = "egress"
+    source_security_group_id = aws_security_group.infra_security_group_was.id
 }
 
 resource "aws_security_group" "infra_security_group_was" {
@@ -116,7 +170,7 @@ resource "aws_security_group" "infra_security_group_was" {
     }
 }
 
-resource "aws_security_group_rule" "was_ssh_rule" {
+resource "aws_security_group_rule" "was_ssh_ingress" {
     security_group_id = aws_security_group.infra_security_group_was.id
     description = "SSH"
     
@@ -128,7 +182,7 @@ resource "aws_security_group_rule" "was_ssh_rule" {
     source_security_group_id = aws_security_group.infra_security_group_bastion.id
 }
 
-resource "aws_security_group_rule" "was_http_rule" {
+resource "aws_security_group_rule" "was_was_ingress" {
     security_group_id = aws_security_group.infra_security_group_was.id
     description = "HTTP"
     
@@ -137,11 +191,10 @@ resource "aws_security_group_rule" "was_http_rule" {
     protocol = "tcp"
     type = "ingress"
 
-    # cidr_blocks = ["0.0.0.0/0"]
-    source_security_group_id = aws_security_group.infra_security_group_web.id
+    source_security_group_id = aws_security_group.infra_security_group_nlb.id
 }
 
-resource "aws_security_group_rule" "was_egress_rule" {
+resource "aws_security_group_rule" "was_all_egress" {
     security_group_id = aws_security_group.infra_security_group_was.id
     description = "ALL"
     
@@ -162,7 +215,7 @@ resource "aws_security_group" "infra_security_group_rds" {
     }
 }
 
-resource "aws_security_group_rule" "rds_ssh_rule" {
+resource "aws_security_group_rule" "rds_ssh_ingress" {
     security_group_id = aws_security_group.infra_security_group_rds.id
     description = "SSH"
     
@@ -174,7 +227,7 @@ resource "aws_security_group_rule" "rds_ssh_rule" {
     source_security_group_id = aws_security_group.infra_security_group_bastion.id
 }
 
-resource "aws_security_group_rule" "rds_mysql_rule" {
+resource "aws_security_group_rule" "rds_mysql_ingress" {
     security_group_id = aws_security_group.infra_security_group_rds.id
     description = "SSH"
     
@@ -186,13 +239,13 @@ resource "aws_security_group_rule" "rds_mysql_rule" {
     source_security_group_id = aws_security_group.infra_security_group_was.id
 }
 
-resource "aws_security_group_rule" "rds_egress_rule" {
+resource "aws_security_group_rule" "rds_mysql_egress" {
     security_group_id = aws_security_group.infra_security_group_rds.id
     description = "ALL"
     
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
     type = "egress"
-    cidr_blocks = ["0.0.0.0/0"]
+    source_security_group_id = aws_security_group.infra_security_group_was.id
 }

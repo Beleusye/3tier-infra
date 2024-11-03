@@ -7,5 +7,5 @@ variable "region" {
 variable "my_ip" {
     description = "My PC IP"
     type = string
-    default = "61.82.205.169"
+    default = "118.38.23.29"
 }

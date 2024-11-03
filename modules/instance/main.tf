@@ -46,7 +46,7 @@ resource "aws_launch_template" "template_web" {
   instance_initiated_shutdown_behavior = "terminate"
   instance_type = var.web_instance_type # t2.micro
   key_name = "infra_key"
-  user_data = var.web_user_data
+  user_data = base64encode(var.web_user_data)
 
   vpc_security_group_ids = [data.terraform_remote_state.security_group.outputs.web_sg_id]
   tag_specifications {
@@ -69,7 +69,7 @@ resource "aws_launch_template" "template_was" {
   instance_initiated_shutdown_behavior = "terminate"
   instance_type = var.was_instance_type # t2.medium
   key_name = "infra_key"
-  user_data = var.was_user_data
+  user_data = base64encode(var.was_user_data)
 
   vpc_security_group_ids = [data.terraform_remote_state.security_group.outputs.was_sg_id]
   tag_specifications {

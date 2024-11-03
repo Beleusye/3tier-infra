@@ -19,14 +19,3 @@ data "terraform_remote_state" "security_group" {
     }
   }
 }
-
-data "terraform_remote_state" "instance" {
-  backend = "remote"
-
-  config = {
-    organization = "kpikachu"
-    workspaces = {
-      name = "instance_test"
-    }
-  }
-}
