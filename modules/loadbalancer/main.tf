@@ -11,14 +11,14 @@ resource "aws_lb" "infra_loadbalancer_alb" {
 
 resource "aws_lb_target_group" "alb_target_group" {
     name = "alb-target-group"
-    port = var.web_port
+    port = var.http_port
     protocol = "HTTP"
     vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
     target_type = "instance"
 
     health_check {
         path = var.alb_health_path
-        port = var.web_port
+        port = var.http_port
     }
 
     tags = {
@@ -28,7 +28,7 @@ resource "aws_lb_target_group" "alb_target_group" {
 
 resource "aws_lb_listener" "alb_listener" {
     load_balancer_arn = aws_lb.infra_loadbalancer_alb.arn
-    port = var.web_port
+    port = var.http_port
     protocol = "HTTP"
     
     default_action {
