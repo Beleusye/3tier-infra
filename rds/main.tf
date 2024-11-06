@@ -9,4 +9,5 @@ module "seoul_rds" {
     db_name = "petclinic"
     db_user = "petclinic"
     db_password = "petclinic"
+    identifier = "infra-rds"
 }

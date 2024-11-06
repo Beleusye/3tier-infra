@@ -37,3 +37,9 @@ variable "db_password" {
   description = "Database Login Password"
   type = string
 }
+
+variable "identifier" {
+  description = "identifier"
+  type = string
+}
+
